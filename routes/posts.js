@@ -5,8 +5,8 @@ const posts = require('../models').posts
 
 
 //getAll
-router.get('/',function (req, res, next) {
-    posts.findAll({include: users})
+router.get('/', function (req, res, next) {
+    posts.findAll({ include: users })
         .then(data => {
             // console.log(res.render.data)
             res.status(200).json(data);
@@ -19,10 +19,10 @@ router.get('/',function (req, res, next) {
 })
 
 //get by id
-router.get('/:id', (req,res,next) => {
+router.get('/:id', (req, res, next) => {
     posts.findOne({
-        where: { id: req.params.id}
-    }, {include: ['users']})
+        where: { id: req.params.id }
+    }, { include: ['users'] })
         .then(data => {
             if (data !== undefined) {
                 res.status(200).json(data.dataValues)
@@ -39,18 +39,18 @@ router.get('/:id', (req,res,next) => {
                 message: `internal server error`,
                 status: 500
             })
-        }) 
+        })
 })
 
 //post a content
 router.post('/', (req, res, next) => {
-   
+
     let body = {
         content: req.body.content,
         user_id: req.body.user_id
     }
     console.log(body)
-    if(!body.content || !body.user_id) {
+    if (!body.content || !body.user_id) {
         res.status(400).json({
             message: "Bad Request"
         })
@@ -59,7 +59,7 @@ router.post('/', (req, res, next) => {
             .then(data => {
                 res.status(201).json(data.dataValues)
             })
-            .catch(err =>{
+            .catch(err => {
                 console.log(err)
                 res.status(500).json({
                     message: `internal server error`,
@@ -69,19 +69,28 @@ router.post('/', (req, res, next) => {
     }
 })
 
-router.put('/:id', (req,res,next) => {
+router.put('/:id', (req, res, next) => {
     let body = {
 
         content: req.body.content,
 
     }
-    
-    // console.log(body)
+
+    console.log("===============")
     posts.update(body, {
-        where : {id: req.params.id}
+        where: { id: req.params.id, user_id: req.users.id }
     })
-    .then(data => {
-        console.log(data)
+        .then(data => {
+            if (data[0]) {
+                posts.findOne({ where: { id: req.params.id } })
+                    .then(data => { res.status(200).json(data) })
+                    .catch(err => res.status(500).json({ message: "Internat Server Error !!", status: 500 }))
+            } else {
+                res.status(403).json({
+                    message: 'unathorized request',
+                    status: 403
+                })
+            }
         })
         .catch(err => {
             res.status(500).json({
