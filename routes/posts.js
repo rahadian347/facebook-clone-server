@@ -49,7 +49,6 @@ router.post('/', (req, res, next) => {
         content: req.body.content,
         user_id: req.body.user_id
     }
-    console.log(body)
     if (!body.content || !body.user_id) {
         res.status(400).json({
             message: "Bad Request"
@@ -76,7 +75,6 @@ router.put('/:id', (req, res, next) => {
 
     }
 
-    console.log("===============")
     posts.update(body, {
         where: { id: req.params.id, user_id: req.users.id }
     })
@@ -98,6 +96,25 @@ router.put('/:id', (req, res, next) => {
                 status: 500
             })
         })
+})
+
+router.delete('/:id', (req,res,next) => {
+    posts.destroy({where: {
+        id: req.params.id,
+        user_id: req.users.id
+    }}).then(deletedPost => {
+        res.status(200).json({
+            message: `success deleted post : ${deletedPost} with id: ${req.users.id}`,
+            status: 200
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(403).json({
+            message: 'unathorized request',
+            status: 403
+        })
+    })
 })
 
 module.exports = router;

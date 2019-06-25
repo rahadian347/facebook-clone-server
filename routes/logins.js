@@ -36,7 +36,6 @@ router.post('/', (req,res,next) => {
                         })
                     } else {
                         let token = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '2h'})
-                        console.log(token)
                         res.status(200).json({
                             data: payload,
                             token: token,
