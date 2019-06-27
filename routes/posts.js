@@ -6,10 +6,16 @@ const posts = require('../models').posts
 
 //getAll
 router.get('/', function (req, res, next) {
-    posts.findAll({ include: users })
+    posts.findAll({ include: users,
+        order: [
+            ['createdAt', 'DESC']
+        ], })
         .then(data => {
-            // console.log(res.render.data)
-            res.status(200).json(data);
+            const sanitzedData = data.map(item => {
+                delete item.dataValues.user.dataValues.password
+                return item
+            })
+            res.status(200).json(sanitzedData)
         })
         .catch(err => {
             res.sendStatus(500).json({
