@@ -7,7 +7,8 @@ const user = require('../models').users
 
 router.post('/', (req,res,next) => {
     let identity = {
-        username: req.body.username
+        username: req.body.username,
+        password: req.body.password
     }
     
     user.findOne({
